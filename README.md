@@ -35,7 +35,7 @@ For example, if you have a subdirectory named 176542 in `audio_root_dir`, the co
 
 Example structure:
 ```
-`annotated_data_dir`/  
+annotated_data_dir/  
 ├── 176542.json  
 ```
 
