@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+
+{% block cssjsheader %}
+<style>
+    #waveform ::part(region-content) {
+        margin-top: 0px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-12 text-center">
+    <h3>
+        Annotations for {{ fname }}
+    </h3>
+</div>
+
+<div class="col-md-12">
+    <div id="waveform">
+        <!-- waveform comes here -->
+    </div>
+
+    <div>
+        <label>
+            Zoom: <input type="range" min="10" max="1000" value="200" />
+        </label>
+
+        <label><input type="checkbox" checked value="scrollbar" /> Scroll bar</label>
+        <label><input type="checkbox" checked value="fillParent" /> Fill parent</label>
+        <label><input type="checkbox" checked value="autoCenter" /> Auto center</label>
+    </div>
+
+    <div style="margin: 1em 0 2em;">
+        <button id="play">Play/Pause</button>
+        <button id="backward">Backward 5s</button>
+        <button id="forward">Forward 5s</button>
+    </div>
+
+    <div>
+        <label>
+            Speed: <input id="speed-control" type="range" min="0.25" max="2.0" value="1.0" step="0.1" />
+            <span id="speed-value">1.0x</span>
+        </label>
+    </div>
+
+    <table id="ref_map" class="hover">
+        <thead>
+            <td>W Index</td>
+            <td>Para word</td>
+            <td>Start</td>
+            <td>End</td>
+            <td>Said word</td>
+        </thead>
+        {% for k, word, start, end, said_words in reference %}
+        <tr>
+            <td>{{ k }}</td>
+            <td>{{ word }}</td>
+            <td>{{ start }}</td>
+            <td>{{ end }}</td>
+            <td>{{ said_words }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link href="/static/css/table_list.css" rel="stylesheet">
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#ref_map').DataTable({
+        "iDisplayLength": -1,
+        "search": {"caseInsensitive": true},
+        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]]
+    });
+});
+</script>
+{% endblock %}
+
+{% block modulescript %}
+<script type="module">
+    import WaveSurfer from 'https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.esm.js'
+    import TimelinePlugin from 'https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.esm.js'
+    import RegionsPlugin from 'https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.esm.js'
+
+    const wavesurfer = WaveSurfer.create({
+        height: 300,
+        container: '#waveform',
+        waveColor: 'rgb(200, 200, 200)',
+        progressColor: 'rgb(128, 128, 128)',
+        url: '/audio/{{ fname }}',
+        minPxPerSec: 200,
+        handleStyle: 'margin-top: 0px'
+    })
+
+    // Initialize the Timeline plugin
+    wavesurfer.registerPlugin(TimelinePlugin.create())
+
+    // Initialize the Regions plugin
+    const wsRegions = wavesurfer.registerPlugin(RegionsPlugin.create())
+
+    // Regions
+    wavesurfer.once('decode', () => {
+        {% for annot in annots %}
+        wsRegions.addRegion({
+            start: {{ annot.start }},
+            end: {{ annot.end }},
+            content: '{{ annot.label }} // {{ annot.mapped_word }} ({{ annot.word_index }})',
+            color: 'rgba(128, 128, 128, 0.2)',
+            drag: false,
+            resize: false,
+        })
+        {% endfor %}
+    })
+
+    // Update the zoom level on slider change
+    wavesurfer.on('decode', () => {
+        const zoomSlider = document.querySelector('input[type="range"]')
+
+        zoomSlider.addEventListener('input', (e) => {
+            const minPxPerSec = e.target.valueAsNumber
+            wavesurfer.zoom(minPxPerSec)
+        })
+    })
+
+    // Speed control
+    const speedControl = document.querySelector('#speed-control')
+    const speedValue = document.querySelector('#speed-value')
+
+    speedControl.addEventListener('input', (e) => {
+        const speed = e.target.valueAsNumber
+        wavesurfer.setPlaybackRate(speed)
+        speedValue.textContent = speed.toFixed(1) + 'x'
+    })
+
+    // A few more controls
+    const playButton = document.querySelector('#play');
+    const forwardButton = document.querySelector('#forward');
+    const backButton = document.querySelector('#backward');
+
+    wavesurfer.once('decode', () => {
+        document.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+            input.onchange = (e) => {
+                wavesurfer.setOptions({
+                    [input.value]: e.target.checked,
+                });
+            };
+        });
+
+        playButton.onclick = () => {
+            wavesurfer.playPause();
+        };
+
+        forwardButton.onclick = () => {
+            wavesurfer.skip(5);
+        };
+
+        backButton.onclick = () => {
+            wavesurfer.skip(-5);
+        };
+    });
+</script>
+{% endblock %}
