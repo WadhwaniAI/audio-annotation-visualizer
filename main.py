@@ -4,7 +4,6 @@ import os
 import glob
 import json
 import string
-import logging
 import collections
 import numpy as np
 
@@ -72,14 +71,6 @@ def home():
         return redirect(url_for("login"))
     return render_template("index.html", samples=DATA)
 
-
-def reformat_annotation_label(label):
-    """Reformat annotation label"""
-    label = label.replace('<NOISE>', '(N)')
-    label = label.replace('</NOISE>', '(!N)')
-    label = label.replace('<NOISE/>', '(N)')
-    return label
-
 def hhmmss_to_ss(input):
     """Convert HH:MM:SS.mmm to seconds"""
     hh, mm, ssms = input.split(':')
@@ -131,7 +122,7 @@ def annot_viewer(fname=""):
         annots.append({
             'start': hhmmss_to_ss(annot['start']),
             'end': hhmmss_to_ss(annot['end']),
-            'label': reformat_annotation_label(annot['Transcription'][0]),
+            'label': annot['Transcription'][0],
             'word_index': word_index,
             'mapped_word': mapped_word
         })
@@ -139,7 +130,7 @@ def annot_viewer(fname=""):
         word_counter += 1
 
     ref_mapback = collections.defaultdict(list)
-    for annot_index, annot in enumerate(annots):
+    for _, annot in enumerate(annots):
         ref_mapback[annot['word_index']].append(annot)
 
     reference = []
@@ -171,18 +162,7 @@ def populate_data():
         ref_text_fn = os.path.join(audio_root_dir, audio_folder, "ref_text.txt")
         if os.path.exists(audio_fn):
             DATA[audio_fn] = (fn, ref_text_fn)
-    print(DATA)
 
-# Gunicorn launch comes here, set logging level based on external command
-# DEBUG/INFO/WARNING/ERROR/CRITICAL
-if __name__ != "__main__":
-    DATA = {}
-    populate_data()
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
-
-# Launching this with native Flask comes here
 if __name__ == "__main__":
     DATA = {}
     populate_data()
