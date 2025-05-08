@@ -1,3 +1,4 @@
+# use code linting - black?
 from flask import Flask, render_template, send_file, redirect, session, url_for, request
 from datetime import timedelta
 import os
@@ -9,10 +10,11 @@ import numpy as np
 
 # Create the main Flask application
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.urandom(24) # TODO: Check why is this required?
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Set the username and password for the login
+# TODO: Move this to a dotenv file
 USERNAME = "user"
 PASSWORD = "user@123"
 
@@ -33,6 +35,7 @@ def set_session_timeout():
 def unauthorized(e):
     return redirect("/login/")
 
+# TODO: Change Makarand's name and instead ask to create an issue on GitHub
 # 404 page
 @app.errorhandler(404)
 def page_not_found(e):
@@ -44,7 +47,7 @@ def internal_server_error(e):
     return "Internal server error. Contact Makarand Tapaswi with the URL that got you to this page. Thanks!"
 
 ###### END: Website handler functions
-
+# TODO: Add to README that autentication is basic and supports only one username and password.
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     """Login page"""
@@ -71,6 +74,7 @@ def home():
         return redirect(url_for("login"))
     return render_template("index.html", samples=DATA)
 
+# TODO: Move this to utils.py
 def hhmmss_to_ss(input):
     """Convert HH:MM:SS.mmm to seconds"""
     hh, mm, ssms = input.split(':')
@@ -148,7 +152,7 @@ def annot_viewer(fname=""):
 @app.route("/audio/<path:audio>")
 def play_audio(audio):
     if not session.get("logged_in"):
-        return redirect(url_for("login"))        
+        return redirect(url_for("login"))
     return send_file(audio)
 
 def populate_data():
