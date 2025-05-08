@@ -7,7 +7,9 @@ import json
 import string
 import collections
 import numpy as np
+from dotenv import load_dotenv
 
+load_dotenv()
 # Create the main Flask application
 app = Flask(__name__)
 app.secret_key = os.urandom(24) # TODO: Check why is this required?
@@ -15,8 +17,10 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Set the username and password for the login
 # TODO: Move this to a dotenv file
-USERNAME = "user"
-PASSWORD = "user@123"
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+AUDIO_ROOT_DIR = os.getenv("AUDIO_ROOT_DIR")
+ANNOTATED_DATA_DIR = os.getenv("ANNOTATED_DATA_DIR")
 
 ###### START: Website handler functions
 
@@ -157,13 +161,11 @@ def play_audio(audio):
 
 def populate_data():
     """Get list of all audio files with JSON annotations"""
-    audio_root_dir = "sample_data/annotation_data"
-    annotated_data_dir = "sample_data/annotated_data"
-    annotation_paths = glob.glob(os.path.join(annotated_data_dir,'*.json'))
+    annotation_paths = glob.glob(os.path.join(ANNOTATED_DATA_DIR,'*.json'))
     for fn in annotation_paths:
         audio_folder = os.path.basename(fn).split('.')[0]
-        audio_fn = os.path.join(audio_root_dir, audio_folder, "audio.mp3")
-        ref_text_fn = os.path.join(audio_root_dir, audio_folder, "ref_text.txt")
+        audio_fn = os.path.join(AUDIO_ROOT_DIR, audio_folder, "audio.mp3")
+        ref_text_fn = os.path.join(ANNOTATED_DATA_DIR, audio_folder, "ref_text.txt")
         if os.path.exists(audio_fn):
             DATA[audio_fn] = (fn, ref_text_fn)
 

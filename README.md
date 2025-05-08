@@ -12,38 +12,33 @@ Simple flask server that uses wavesurfer.js to do quality checks on annotations
    cd AudioLens
    ```
 
-2. **Create a Virtual Environment**:
-   Run the following command to create a virtual environment named `audiolens` using Python 3.9:
+2. **Create and activate a Conda Environment**:
+   Run the following command to create a conda environment named `audiolens` using Python 3.10:
    ```bash
-   python3.9 -m venv audiolens
+   conda create -n audiolens python=3.10
+   ```
+   ```bash
+   conda activate audiolens
    ```
 
-3. **Activate the Virtual Environment**:
-   On Linux or macOS:
-   ```bash
-   source audiolens/bin/activate
-   ```
-   On Windows:
-   ```cmd
-   audiolens\Scripts\activate
-   ```
-
-4. **Install Dependencies**:
+3. **Install Dependencies**:
    Use the `requirements.txt` file to install all necessary dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Verify Installation**:
-   Ensure all dependencies are installed correctly by running:
+4. **Set Environment Variables**:
+   Copy the `.env.example` file to `.env` and set the following environment variables:
    ```bash
-   pip list
+   USERNAME=<username>
+   PASSWORD=<password>
+   AUDIO_ROOT_DIR=<path_to_audio_data>
+   ANNOTATED_DATA_DIR=<path_to_annotated_data>
    ```
 
-6. **Deactivate the Virtual Environment** (when done):
-   Run the following command to deactivate the virtual environment:
+5. **Run the Server**:
    ```bash
-   deactivate
+   python main.py
    ```
 
 ## Usage
