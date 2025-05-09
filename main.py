@@ -12,8 +12,6 @@ load_dotenv()
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 AUDIO_ROOT_DIR = os.getenv("AUDIO_ROOT_DIR")
-ERROR_MESSAGE_DEFAULT = os.getenv("ERROR_MESSAGE_DEFAULT")
-print(AUDIO_ROOT_DIR)
 
 # Create the main Flask application
 app = Flask(__name__)
@@ -32,7 +30,11 @@ def unauthorized(e):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return ERROR_MESSAGE_DEFAULT
+    return """Something went wrong. Please refresh the page or restart the server. 
+    In case of further escalation, please create an issue on GitHub with details of how to reproduce the error. We will try our best to resolve the issue.
+    Additionally, we'd love to have you contribute to the project by resolving any issue you find relevant under the 'Issues' tracker.
+    Thank you!
+    """
 
 
 # 500 page
