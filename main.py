@@ -1,5 +1,4 @@
 import collections
-import glob
 import json
 import os
 import string
@@ -9,31 +8,22 @@ import numpy as np
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, send_file, session, url_for
 
+# Load environment variables
 load_dotenv()
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+AUDIO_ROOT_DIR = os.getenv("AUDIO_ROOT_DIR")
+ERROR_MESSAGE_DEFAULT = os.getenv("ERROR_MESSAGE_DEFAULT")
+print(AUDIO_ROOT_DIR)
+
 # Create the main Flask application
 app = Flask(__name__)
+
+# Set the secret key for the Flask application - used for session management
 app.secret_key = os.urandom(24)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-# Set the username and password for the login
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
-AUDIO_ROOT_DIR = os.path.abspath(os.path.expanduser(os.getenv("AUDIO_ROOT_DIR")))
-
-###### START: Website handler functions
-
-
-@app.after_request
-def after_request(response):
-    response.headers.add("Accept-Ranges", "bytes")
-    return response
-
-
-@app.before_request
-def set_session_timeout():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=30)
-
+### Website handler functions
 
 # 401 Unauthorized
 @app.errorhandler(401)
@@ -41,20 +31,17 @@ def unauthorized(e):
     return redirect("/login/")
 
 
-# TODO: Change Makarand's name and instead ask to create an issue on GitHub
-# 404 page
 @app.errorhandler(404)
 def page_not_found(e):
-    return 'Page Not Found. Go back to <a href="/">home</a>, or contact Makarand Tapaswi with the URL.'
+    return ERROR_MESSAGE_DEFAULT
 
 
 # 500 page
 @app.errorhandler(500)
 def internal_server_error(e):
-    return "Internal server error. Contact Makarand Tapaswi with the URL that got you to this page. Thanks!"
+    return # 404 page
 
 
-###### END: Website handler functions
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     """Login page"""
@@ -105,7 +92,7 @@ def annot_viewer(fname=""):
     try:
         json_fname, ref_text_fname = DATA[fname]
     except:
-        json_fname, ref_text_fname = DATA["/" + fname]
+        json_fname, ref_text_fname = DATA["./" + fname]
 
     with open(json_fname, "r") as fid:
         json_annots = json.load(fid)
