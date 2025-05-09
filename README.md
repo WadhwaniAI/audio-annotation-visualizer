@@ -47,7 +47,7 @@ Set `audio_root_dir` in the `.env` file. The structure of the `audio_root_dir` s
 - Each subdirectory represents a single data sample.
 - Each subdirectory contains: 
    - `audio.mp3`: A recording of the sample.
-   - `ref_text.txt`: A text file containing the transcription of the audio.mp3 recording.
+   - `ref_text.txt`: (optional) A text file containing the transcription of the audio.mp3 recording.
    - `annotation.json`: A json file containing annotations corresponding to the `audio.mp3` recording.
 
 Example structure:

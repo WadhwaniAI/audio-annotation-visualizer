@@ -96,14 +96,16 @@ def annot_viewer(fname=""):
     with open(json_fname, "r") as fid:
         json_annots = json.load(fid)
 
-    ref_text = open(ref_text_fname, "r").read().replace("\n", " ")
+    if os.path.exists(ref_text_fname):
+        ref_text = open(ref_text_fname, "r").read().replace("\n", " ")
+        # Step 2: Strip punctuation, convert to lowercase, and clean up spaces
+        ref_text = ref_text.translate(str.maketrans("", "", string.punctuation)).lower()
+        ref_text = ref_text.replace("'", "").replace('"', "").replace("  ", " ").strip()
+        # Step 3: Split into words
+        ref_text = ref_text.split(" ")
+    else:
+        ref_text = []
 
-    # Step 2: Strip punctuation, convert to lowercase, and clean up spaces
-    ref_text = ref_text.translate(str.maketrans("", "", string.punctuation)).lower()
-    ref_text = ref_text.replace("'", "").replace('"', "").replace("  ", " ").strip()
-
-    # Step 3: Split into words
-    ref_text = ref_text.split(" ")
     # Process JSON annotations
     annots = []
     word_counter = 0  # This will be used to map words sequentially

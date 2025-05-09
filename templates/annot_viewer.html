@@ -104,7 +104,7 @@ $(document).ready(function() {
         wsRegions.addRegion({
             start: {{ annot.start }},
             end: {{ annot.end }},
-            content: '{{ annot.label }} // {{ annot.mapped_word }} ({{ annot.word_index }})',
+            content: '{% if annot.word_index != "nan" and annot.word_index is not none %}{{ annot.label }} ({{ annot.word_index }}){% else %}{{ annot.label }}{% endif %}',
             color: 'rgba(128, 128, 128, 0.2)',
             drag: false,
             resize: false,
@@ -157,6 +157,14 @@ $(document).ready(function() {
         backButton.onclick = () => {
             wavesurfer.skip(-5);
         };
+        // Add ref_text code
+        const refText = document.createElement('div');
+        refText.id = 'ref_text';
+        refText.innerHTML = `
+            <h4>Reference Text(Optional)</h4>
+            <p>{{ ref_text }}</p>
+        `;
+        document.querySelector('.col-md-12').appendChild(refText);
     });
 </script>
 {% endblock %}
