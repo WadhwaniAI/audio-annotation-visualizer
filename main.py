@@ -12,15 +12,13 @@ from flask import Flask, redirect, render_template, request, send_file, session,
 load_dotenv()
 # Create the main Flask application
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # TODO: Check why is this required?
+app.secret_key = os.urandom(24)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Set the username and password for the login
-# TODO: Move this to a dotenv file
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
-AUDIO_ROOT_DIR = os.getenv("AUDIO_ROOT_DIR")
-ANNOTATED_DATA_DIR = os.getenv("ANNOTATED_DATA_DIR")
+AUDIO_ROOT_DIR = os.path.abspath(os.path.expanduser(os.getenv("AUDIO_ROOT_DIR")))
 
 ###### START: Website handler functions
 
@@ -57,7 +55,6 @@ def internal_server_error(e):
 
 
 ###### END: Website handler functions
-# TODO: Add to README that autentication is basic and supports only one username and password.
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     """Login page"""
@@ -183,13 +180,15 @@ def play_audio(audio):
 
 def populate_data():
     """Get list of all audio files with JSON annotations"""
-    annotation_paths = glob.glob(os.path.join(ANNOTATED_DATA_DIR, "*.json"))
-    for fn in annotation_paths:
-        audio_folder = os.path.basename(fn).split(".")[0]
+    annotated_data = os.listdir(AUDIO_ROOT_DIR)
+    for audio_folder in annotated_data:
         audio_fn = os.path.join(AUDIO_ROOT_DIR, audio_folder, "audio.mp3")
-        ref_text_fn = os.path.join(ANNOTATED_DATA_DIR, audio_folder, "ref_text.txt")
+        ref_text_fn = os.path.join(AUDIO_ROOT_DIR, audio_folder, "ref_text.txt")
+        annotation_json_path = os.path.join(
+            AUDIO_ROOT_DIR, audio_folder, "annotation.json"
+        )
         if os.path.exists(audio_fn):
-            DATA[audio_fn] = (fn, ref_text_fn)
+            DATA[audio_fn] = (annotation_json_path, ref_text_fn)
 
 
 if __name__ == "__main__":

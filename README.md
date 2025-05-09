@@ -1,4 +1,4 @@
-![py3919](https://img.shields.io/badge/python-3.9.19-brightgreen.svg)
+![py31016](https://img.shields.io/badge/python-3.10.16-brightgreen.svg)
 
 # AudioLens
 Simple flask server that uses wavesurfer.js to do quality checks on annotations
@@ -33,7 +33,6 @@ Simple flask server that uses wavesurfer.js to do quality checks on annotations
    USERNAME=<username>
    PASSWORD=<password>
    AUDIO_ROOT_DIR=<path_to_audio_data>
-   ANNOTATED_DATA_DIR=<path_to_annotated_data>
    ```
 
 5. **Run the Server**:
@@ -41,52 +40,22 @@ Simple flask server that uses wavesurfer.js to do quality checks on annotations
    python main.py
    ```
 
-## Usage
-You can set username and password for authentication in `main.py`
+## Data Directory Setup
+Set `audio_root_dir` in the `.env` file. The structure of the `audio_root_dir` should look like this:
 
-In the populate_data function in main.py, you need to configure the following:
-
-1. `audio_root_dir`:
-This is the path where all the audio data and corresponding reference text files are stored. Inside this directory:
-
-Each subdirectory represents a single data sample.
-Each subdirectory contains: 
-
-`audio.mp3`: A recording of the sample.
-`ref_text.txt`: A text file containing the transcription of the audio.mp3 recording.
+- This is the path where all the audio data, corresponding reference text and annotation files are stored. Inside this directory:
+- Each subdirectory represents a single data sample.
+- Each subdirectory contains: 
+   - `audio.mp3`: A recording of the sample.
+   - `ref_text.txt`: A text file containing the transcription of the audio.mp3 recording.
+   - `annotation.json`: A json file containing annotations corresponding to the `audio.mp3` recording.
 
 Example structure:
 
 ```
 audio_root_dir/
-├── sample_1/           
-│   ├── audio.mp3     
-│   └── ref_text.txt  
+├── sample_1/
+│   ├── audio.mp3
+│   └── ref_text.txt
+│   └── annotation.json
 ```
-2. `annotated_data_dir`:
-This is the path where all the annotation files (in JSON format) are stored. Each JSON file contains manually annotated data corresponding to a subdirectory in audio_root_dir.
-
-## Naming Convention:
-
-The name of the annotation JSON file must match the name of the subdirectory in `audio_root_dir`.
-For example, if you have a subdirectory named `sample_1` in `audio_root_dir`, the corresponding annotation file in `annotated_data_dir` must be named `sample_1.json`.
-
-Example structure:
-```
-annotated_data_dir/  
-├── sample_1.json  
-```
-
-
-Next, Run:
-
-```
-python main.py
-```
-
-Visit `http://127.0.0.1:30110` to open the app. 
-
-
-
-
-
