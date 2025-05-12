@@ -2,7 +2,7 @@
 
 # AudioLens
 Simple flask server that uses wavesurfer.js to visualize and check for quality of annotations of your audio data. The interface looks like the image shown below. 
-
+![Sample Image](data/image.png)
 ## Setup
 
 1. **Clone the Repository**:
