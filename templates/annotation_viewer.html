@@ -46,16 +46,16 @@
     <table id="ref_map" class="hover">
         <thead>
             <td>Index</td>
+            <td>Annotated Word</td>
             <td>Start</td>
             <td>End</td>
-            <td>Said word</td>
         </thead>
-        {% for k, word, start, end, said_words in reference %}
+        {% for annotation in annotations %}
         <tr>
-            <td>{{ k }}</td>
-            <td>{{ start }}</td>
-            <td>{{ end }}</td>
-            <td>{{ said_words }}</td>
+            <td>{{ annotation.index }}</td>
+            <td>{{ annotation.label }}</td>
+            <td>{{ annotation.start }}</td>
+            <td>{{ annotation.end }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -100,11 +100,11 @@ $(document).ready(function() {
 
     // Regions
     wavesurfer.once('decode', () => {
-        {% for annot in annots %}
+        {% for annotation in annotations %}
         wsRegions.addRegion({
-            start: {{ annot.start }},
-            end: {{ annot.end }},
-            content: '{{ annot.label }}',
+            start: {{ annotation.start }},
+            end: {{ annotation.end }},
+            content: '{{ annotation.label }}',
             color: 'rgba(128, 128, 128, 0.2)',
             drag: false,
             resize: false,

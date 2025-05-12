@@ -112,54 +112,29 @@ def annotation_viewer(fname=""):
         ref_text = []
 
     # Process JSON annotations
-    annots = []
-    word_counter = 0  # This will be used to map words sequentially
+    annotations = []
 
-    for annot in json_annots["annotations"]:
+    annotation_transcript = ""
+    for i, annot in enumerate(json_annots["annotations"]):
         if len(annot["Transcription"]) != 1:
             print("** Something wrong with annotation:", annot)
             continue
+        
+        annotation_transcript += " " + annot["Transcription"][0]
 
-        word_index = word_counter if word_counter < len(ref_text) else np.nan
-
-        if not np.isnan(word_index) and 0 <= word_index < len(ref_text):
-            mapped_word = ref_text[word_index]
-        else:
-            mapped_word = "none"
-
-        annots.append(
+        annotations.append(
             {
+                "index": i,
                 "start": hhmmss_to_ss(annot["start"]),
                 "end": hhmmss_to_ss(annot["end"]),
                 "label": annot["Transcription"][0],
-                "word_index": word_index,
-                "mapped_word": mapped_word,
             }
-        )
-
-        word_counter += 1
-
-    ref_mapback = collections.defaultdict(list)
-    for _, annot in enumerate(annots):
-        ref_mapback[annot["word_index"]].append(annot)
-
-    reference = []
-    for k, word in enumerate(ref_text):
-        reference.append(
-            [
-                k,
-                word,
-                [annot["start"] for annot in ref_mapback[k]],
-                [annot["end"] for annot in ref_mapback[k]],
-                [annot["label"] for annot in ref_mapback[k]],
-            ]
         )
 
     return render_template(
         "annotation_viewer.html",
         fname=fname,
-        annots=annots,
-        reference=reference,
+        annotations=annotations,
         ref_text=" ".join(ref_text),
     )
 
@@ -175,13 +150,13 @@ def populate_data():
     """Get list of all audio files with JSON annotations"""
     annotated_data = os.listdir(AUDIO_ROOT_DIR)
     for audio_folder in annotated_data:
-        audio_fn = os.path.join(AUDIO_ROOT_DIR, audio_folder, "audio.mp3")
-        ref_text_fn = os.path.join(AUDIO_ROOT_DIR, audio_folder, "ref_text.txt")
+        audio_file_path = os.path.join(AUDIO_ROOT_DIR, audio_folder, "audio.mp3")
+        ref_text_file_path = os.path.join(AUDIO_ROOT_DIR, audio_folder, "ref_text.txt")
         annotation_json_path = os.path.join(
             AUDIO_ROOT_DIR, audio_folder, "annotation.json"
         )
-        if os.path.exists(audio_fn):
-            ANNOTATION_DATA[audio_fn] = (annotation_json_path, ref_text_fn)
+        if os.path.exists(audio_file_path):
+            ANNOTATION_DATA[audio_file_path] = (annotation_json_path, ref_text_file_path)
 
 if __name__ == "__main__":
     populate_data()
