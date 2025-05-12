@@ -1,7 +1,7 @@
 ![py31016](https://img.shields.io/badge/python-3.10.16-brightgreen.svg)
 
 # AudioLens
-Simple flask server that uses wavesurfer.js to do quality checks on annotations
+Simple flask server that uses wavesurfer.js to visualize and check for quality of annotations of your audio data. The interface looks like the image shown below. 
 
 ## Setup
 
@@ -47,7 +47,7 @@ Set `audio_root_dir` in the `.env` file. The structure of the `audio_root_dir` s
 - Each subdirectory represents a single data sample.
 - Each subdirectory contains: 
    - `audio.mp3`: A recording of the sample.
-   - `ref_text.txt`: (optional) A text file containing the transcription of the audio.mp3 recording.
+   - `ref_text.txt`: (optional) A text file containing the reference text of the audio.mp3 recording. This is relevant for audios captured in a read aloud setting where the speaker is given a text to read.
    - `annotation.json`: A json file containing annotations corresponding to the `audio.mp3` recording.
 
 Example structure:

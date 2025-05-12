@@ -13,6 +13,9 @@ USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 AUDIO_ROOT_DIR = os.getenv("AUDIO_ROOT_DIR")
 
+# Global variable to load and store the annotation data being used by the server
+ANNOTATION_DATA = {}
+
 # Create the main Flask application
 app = Flask(__name__)
 
@@ -69,7 +72,7 @@ def home():
     """Show home page"""
     if not session.get("logged_in"):
         return redirect(url_for("login"))
-    return render_template("index.html", samples=DATA)
+    return render_template("index.html", samples=ANNOTATION_DATA)
 
 
 # TODO: Move this to utils.py
@@ -79,21 +82,21 @@ def hhmmss_to_ss(input):
     return round(float(hh) * 3600 + float(mm) * 60 + float(ssms), 3)
 
 
-@app.route("/annot_viewer/")
-@app.route("/annot_viewer/<path:fname>/")
-def annot_viewer(fname=""):
+@app.route("/annotation_viewer/")
+@app.route("/annotation_viewer/<path:fname>/")
+def annotation_viewer(fname=""):
     if not session.get("logged_in"):
         return redirect(url_for("login"))
 
     if fname == "":
         # pick a random file
-        fname = list(DATA.keys())[np.random.randint(0, len(DATA))]
+        fname = list(ANNOTATION_DATA.keys())[np.random.randint(0, len(ANNOTATION_DATA))]
 
     # Prep audio path and json annotations
     try:
-        json_fname, ref_text_fname = DATA[fname]
+        json_fname, ref_text_fname = ANNOTATION_DATA[fname]
     except:
-        json_fname, ref_text_fname = DATA["./" + fname]
+        json_fname, ref_text_fname = ANNOTATION_DATA["./" + fname]
 
     with open(json_fname, "r") as fid:
         json_annots = json.load(fid)
@@ -153,7 +156,7 @@ def annot_viewer(fname=""):
         )
 
     return render_template(
-        "annot_viewer.html",
+        "annotation_viewer.html",
         fname=fname,
         annots=annots,
         reference=reference,
@@ -178,10 +181,8 @@ def populate_data():
             AUDIO_ROOT_DIR, audio_folder, "annotation.json"
         )
         if os.path.exists(audio_fn):
-            DATA[audio_fn] = (annotation_json_path, ref_text_fn)
-
+            ANNOTATION_DATA[audio_fn] = (annotation_json_path, ref_text_fn)
 
 if __name__ == "__main__":
-    DATA = {}
     populate_data()
     app.run(host="0.0.0.0", port=30110, debug=True)
