@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo "Starting ORF-CHERRYPY on 30100..."
-python launch_cherrypy.py 30100 &
-

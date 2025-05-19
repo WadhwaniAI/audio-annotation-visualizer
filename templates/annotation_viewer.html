@@ -45,19 +45,17 @@
 
     <table id="ref_map" class="hover">
         <thead>
-            <td>W Index</td>
-            <td>Para word</td>
+            <td>Index</td>
+            <td>Annotated Word</td>
             <td>Start</td>
             <td>End</td>
-            <td>Said word</td>
         </thead>
-        {% for k, word, start, end, said_words in reference %}
+        {% for annotation in annotations %}
         <tr>
-            <td>{{ k }}</td>
-            <td>{{ word }}</td>
-            <td>{{ start }}</td>
-            <td>{{ end }}</td>
-            <td>{{ said_words }}</td>
+            <td>{{ annotation.index }}</td>
+            <td>{{ annotation.label }}</td>
+            <td>{{ annotation.start }}</td>
+            <td>{{ annotation.end }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -102,11 +100,11 @@ $(document).ready(function() {
 
     // Regions
     wavesurfer.once('decode', () => {
-        {% for annot in annots %}
+        {% for annotation in annotations %}
         wsRegions.addRegion({
-            start: {{ annot.start }},
-            end: {{ annot.end }},
-            content: '{{ annot.label }} // {{ annot.mapped_word }} ({{ annot.word_index }})',
+            start: {{ annotation.start }},
+            end: {{ annotation.end }},
+            content: '{{ annotation.label }}',
             color: 'rgba(128, 128, 128, 0.2)',
             drag: false,
             resize: false,
@@ -159,6 +157,16 @@ $(document).ready(function() {
         backButton.onclick = () => {
             wavesurfer.skip(-5);
         };
+        // Add ref_text code
+        const refText = document.createElement('div');
+        refText.id = 'ref_text';
+        refText.innerHTML = `
+            {% if ref_text %}
+                <h6>Reference Text</h6>
+                <p>{{ ref_text }}</p>
+            {% endif %}
+        `;
+        document.querySelector('.col-md-12').appendChild(refText);
     });
 </script>
 {% endblock %}

@@ -1,5 +1,0 @@
-#!/bin/sh
-
-echo "Killing all CHERRYPY processes on port 30100..."
-pkill -f 'python launch_cherrypy.py 30100'
-
